@@ -14,7 +14,7 @@ func (app *App) UserPage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if user == nil {
+	if user == nil || !user.Username.Valid {
 		http.NotFound(w, r)
 		return
 	}
