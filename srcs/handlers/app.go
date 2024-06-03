@@ -14,13 +14,15 @@ type Models struct {
 type App struct {
 	Settings *settings.Settings
 	Models *Models
+	Url string
 }
 
-func NewApp(config *settings.Settings, db *sql.DB) *App {
+func NewApp(config *settings.Settings, db *sql.DB, url map[string]string) *App {
 	return &App{
 		Settings: config,
 		Models: &Models{
 			User: &models.UserModel{DB: db},
 		},
+		Url: url["scheme"] + url["host"] + url["port"],
 	}
 }

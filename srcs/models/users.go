@@ -18,7 +18,7 @@ type UserModel struct {
 }
 
 func (m *UserModel) GetListWithUsername() ([]User, error) {
-	rows, err := m.DB.Query("SELECT id, email, username FROM users WHERE username IS NOT NULL")
+	rows, err := m.DB.Query("SELECT id, username, email FROM users WHERE username IS NOT NULL")
 	if err != nil {
 		return nil, err
 	}
@@ -26,9 +26,21 @@ func (m *UserModel) GetListWithUsername() ([]User, error) {
 		_ = rows.Close()
 	}(rows)
 
-	//Loop through each rows
-
 	var users []User
+
+	//Loop through each rows
+	for rows.Next() {
+		var user User
+		err = rows.Scan(
+			&user.Id,
+			&user.Username,
+			&user.Email,
+		)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
 	return users, nil
 }
 

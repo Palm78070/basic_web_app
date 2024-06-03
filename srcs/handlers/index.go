@@ -5,5 +5,6 @@ import (
 )
 
 func (app *App) IndexPage(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, "index.html", nil)
+	app.renderTemplate(w, "index.html", map[string]any{
+	})
 }

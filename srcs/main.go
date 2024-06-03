@@ -19,12 +19,20 @@ func main() {
 		panic(err)
 	}
 
-	app := handlers.NewApp(config, db)
+	url := map[string]string{
+		"scheme": "http://",
+		"host": "localhost",
+		"port": ":8080",
+	}
+
+	app := handlers.NewApp(config, db, url)
 
 	log.Printf("Connected to db: %v", db)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", app.IndexPage)
 	router.HandleFunc("/users/{username}", app.UserPage)
-	http.ListenAndServe(":8080", router)
+	router.HandleFunc("/userList", app.UserList)
+	http.ListenAndServe(url["port"], router)
+	// http.ListenAndServe(":8080", router)
 }
