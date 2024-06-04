@@ -14,6 +14,7 @@ func (a *App) renderTemplate(w http.ResponseWriter, templateName string, data ma
 	t, err := template.ParseFiles(tmplFile)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	data["URL"] = a.Url

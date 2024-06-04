@@ -6,15 +6,12 @@
 	<title>List of users</title>
 </head>
 <body>
-	<h1>UserList</h1>
-	<!-- <ul>
-		{{range .UserList}}
-			<li>
-				<a href="">
-
-				</a>
-			</li>
-		{{end}}
-	</ul> -->
+	<h1>User list</h1>
+	<ul>
+	{{range .UserList}}
+		<li><a href="{{$.URL}}/users/{{.Username.String}}">{{.Username.String}}</a></li>
+	{{end}}
+	</ul>
+	<p>Back to <a href="{{.URL}}/">Home page</a></p>
 </body>
 </html>

@@ -46,11 +46,11 @@ func (app *App) UserList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	len_user := len(userList)
-	for i:=0; i < len_user; i++ {
-		tmp_user := userList[i]
-		fmt.Println(tmp_user.Id, tmp_user.Username.String, tmp_user.Email)
-	}
+	// len_user := len(userList)
+	// for i:=0; i < len_user; i++ {
+	// 	tmp_user := userList[i]
+	// 	fmt.Println(tmp_user.Id, tmp_user.Username.String, tmp_user.Email)
+	// }
 
 	app.renderTemplate(w, "userList.html", map[string]any{
 		"UserList": userList,
