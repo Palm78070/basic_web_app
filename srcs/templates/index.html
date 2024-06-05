@@ -7,6 +7,12 @@
 </head>
 <body>
 	<h1>Home page</h1>
-	<p>See list of users at <a href="{{.URL}}/userList">user page</a></p>
+	{{if not .IsLogin}}
+		<p>google account <a href="{{.URL}}/login">login</a></p>
+	{{else}}
+		<h4>Welcome {{.Username}}!!!</h4>
+		<p>See list of users at <a href="{{.URL}}/userList">user page</a></p>
+		<p><a href="{{.URL}}/logout">logout</a></p>
+	{{end}}
 </body>
 </html>

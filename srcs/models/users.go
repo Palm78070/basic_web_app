@@ -61,3 +61,21 @@ func (m *UserModel) GetByUsername(username string) (*User, error) {
 	}
 	return &user, err
 }
+
+func (m *UserModel) GetByEmail(email string) (*User, error) {
+	var user User
+	//QueryRow => query just one row from the table
+	row := m.DB.QueryRow("SELECT id, username, email FROM users WHERE email = $1", email)
+	err := row.Scan(
+		&user.Id,
+		&user.Username,
+		&user.Email,
+	)
+	if err != nil && errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &user, err
+}
