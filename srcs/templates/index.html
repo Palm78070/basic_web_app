@@ -8,6 +8,7 @@
 <body>
 	<h1>Home page</h1>
 	{{if not .IsLogin}}
+		<p>register <a href="{{.URL}}/register">register</a></p>
 		<p>google account <a href="{{.URL}}/login">login</a></p>
 	{{else}}
 		<h4>Welcome {{.Username}}!!!</h4>

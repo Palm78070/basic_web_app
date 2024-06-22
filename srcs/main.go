@@ -37,6 +37,7 @@ func main() {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", app.IndexPage)
+	router.HandleFunc("/register", app.RegisterPage).Methods("GET", "POST")
 	router.HandleFunc("/login", app.Login)
 	router.HandleFunc("/logout", app.Logout)
 	router.HandleFunc("/callback", app.Callback)

@@ -4,6 +4,11 @@ run:
 up:
 	docker-compose up --build
 
+start:
+	docker-compose start
+stop:
+	docker-compose stop
+
 down:
 	docker-compose down
 
