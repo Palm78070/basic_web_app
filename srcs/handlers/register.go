@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Palm78070/basic_web_app/models"
@@ -26,6 +28,7 @@ func (app *App) registerUser(username string, email string) {
 		fmt.Printf("Error inserting user into database: %v\n", err)
 		return
 	}
+	fmt.Println("User inserted successfully")
 }
 
 func (app *App) RegisterPage(w http.ResponseWriter, r* http.Request) {
@@ -37,12 +40,14 @@ func (app *App) RegisterPage(w http.ResponseWriter, r* http.Request) {
 	}
 
 	if r.Method == http.MethodPost {
+
 		var user models.User
-		err := r.ParseForm()
+		err := r.ParseMultipartForm(10 << 20) //Maximum form size 10MB
 		if err != nil {
 			http.Error(w, "Invalid form submission", http.StatusBadRequest)
 			return
 		}
+
 
 		user.Username = sql.NullString{
 			String: r.FormValue("username"),
@@ -52,19 +57,30 @@ func (app *App) RegisterPage(w http.ResponseWriter, r* http.Request) {
 		user.Email = r.FormValue("email")
 
 		if !user.Username.Valid || user.Email == "" {
-			http.Error(w, "Invalid form submission", http.StatusBadRequest)
+			log.Printf("Invalid form submission\n")
+			json.NewEncoder(w).Encode(map[string]any{
+				"success": false,
+				"message": "Invalid form submission, username or email is not valid",
+			})
 			return
 		}
 
-
 		if app.is_register_user(user.Username.String, user.Email) {
-			http.Error(w, "User already exists", http.StatusBadRequest)
+			log.Printf("User already exists\n")
+			json.NewEncoder(w).Encode(map[string]any{
+				"success": false,
+				"message": "User already exists, please use other username or email",
+			})
+			return
 		}
 
 		fmt.Println("username: ", user.Username)
 		fmt.Println("email: ", user.Email)
 
 		app.registerUser(user.Username.String, user.Email)
-		http.Redirect(w, r, "/register", http.StatusSeeOther)
+		// http.Redirect(w, r, "/register", http.StatusSeeOther)
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": true,
+		})
 	}
 }
