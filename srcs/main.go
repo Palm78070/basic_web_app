@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Palm78070/basic_web_app/db"
 	"github.com/Palm78070/basic_web_app/handlers"
@@ -31,27 +32,18 @@ func main() {
 	}
 
 	url := map[string]string{
-		"scheme": "http://",
-		"host": "localhost",
-		"port": ":8080",
+		"scheme": os.Getenv("SCHEME"),
+		"host": os.Getenv("HOST"),
+		"port": ":" + os.Getenv("PORT"),
 	}
 
 	app := handlers.NewApp(config, db, url)
 
 	log.Printf("Connected to db: %v", db)
 
-	//Setting file server
-	// Serve static files from the /static/ directory that locate on the root of the project
-	//fs := http.FileServer(http.Dir("./static")) //Creates a handler to serve files from a specified directory
-	//http.Handle("/static/", http.StripPrefix("/static/", fs)) //Registers the handler for a specific URL path StripPrefix => remove prefix static so result => static/css/file_to_serve
-	// fs := http.FileServer(http.Dir("srcs/static"))
-	// http.Handle("/static/", logRequest(setMimeType(http.StripPrefix("/static/", fs))))
-	// http.Handle("/static/", fs)
-
 	router := mux.NewRouter()
 
 	fs := http.FileServer(http.Dir("./static")) //Creates a handler to serve files from a specified directory
-	//http.Handle("/static/", http.StripPrefix("/static/", fs)) //Registers the handler for a specific URL path StripPrefix => remove prefix static so result => static/css/file_to_serve
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs)) //match any path that has /static/ prefix handler is an http.Handler that will process the HTTP requests
 
 	router.HandleFunc("/", app.IndexPage)

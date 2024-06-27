@@ -37,7 +37,7 @@ func NewApp(config *settings.Settings, db *sql.DB, url map[string]string) *App {
 		Url: url["scheme"] + url["host"] + url["port"],
 		currentUser: &Login{
 			googleOauthConfig: &oauth2.Config{
-				RedirectURL: "http://localhost:8080/callback",
+				RedirectURL: url["scheme"] + url["host"] + url["port"] + "/callback",
 				ClientID: os.Getenv("GOOGLE_CLIENT_ID"),
 				ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 				Scopes: []string{"https://www.googleapis.com/auth/userinfo.email"},

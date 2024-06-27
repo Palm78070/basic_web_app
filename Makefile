@@ -1,6 +1,10 @@
 run:
 	cd srcs/ && go run main.go
 
+watch:
+	./watch.sh
+#	while true; do find srcs/ -name "*.go" | entr -r make run; sleep(1); done
+
 up:
 	docker-compose up --build
 
