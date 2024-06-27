@@ -13,3 +13,4 @@ Create basic web application using Go language.
   - docker container
   - koanf (library for reading configuration from different sources in different formats in Go applications)
   - validator (Use for validate env value from .env file or env variable)
+  - oauth2 (login via google account)
