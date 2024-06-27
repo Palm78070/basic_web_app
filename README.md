@@ -16,6 +16,4 @@ Create basic web application using Go language.
   - oauth2 (login via google account)
 
 ## Tips
-  If you have entr command, you can use make command 
-  ```make watch```
-  which will run script in watch.sh to restart server whenever there is change in *.go files in srcs directory
+  If you have entr command, you can use make command ```make watch``` which will run script in watch.sh to restart server whenever there is change in *.go files in srcs directory
