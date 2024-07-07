@@ -6,6 +6,7 @@ require github.com/gorilla/mux v1.8.1
 
 require (
 	github.com/go-playground/validator/v10 v10.21.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1
 	github.com/knadh/koanf/parsers/dotenv v1.0.0
 	github.com/knadh/koanf/providers/env v0.1.0

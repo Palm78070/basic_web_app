@@ -53,6 +53,8 @@ func main() {
 	router.HandleFunc("/callback", app.Callback)
 	router.HandleFunc("/users/{username}", app.UserPage)
 	router.HandleFunc("/userList", app.UserList)
+	router.HandleFunc("/ws", app.HandleConnections)
+	go app.HandleMessages()
 	http.ListenAndServe(url["port"], router)
 	// http.ListenAndServe(":8080", router)
 }

@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"database/sql"
+	"net/http"
 	"os"
 
 	"github.com/Palm78070/basic_web_app/models"
 	"github.com/Palm78070/basic_web_app/settings"
+	"github.com/gorilla/websocket"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -26,6 +28,7 @@ type App struct {
 	Models *Models
 	Url string
 	currentUser *Login
+	chat *Chat
 }
 
 func NewApp(config *settings.Settings, db *sql.DB, url map[string]string) *App {
@@ -46,6 +49,15 @@ func NewApp(config *settings.Settings, db *sql.DB, url map[string]string) *App {
 			//TODO: randomize it
 			randomState : "random",
 			IsLogin: false,
+		},
+		chat: &Chat {
+			upgrader: &websocket.Upgrader{
+				CheckOrigin: func(r *http.Request) bool {
+					return true
+				},
+			},
+			clients: make(map[*websocket.Conn]bool),
+			broadcast: make(chan Message),
 		},
 	}
 }
