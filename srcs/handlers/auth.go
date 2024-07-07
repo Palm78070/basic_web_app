@@ -12,6 +12,47 @@ import (
 )
 
 func (app *App)Login(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		app.renderTemplate(w, "login.html", map[string]any{
+		})
+		return
+	}
+	if r.Method != http.MethodPost {
+		return
+	}
+	err := r.ParseForm()
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Invalid form submission", http.StatusBadRequest)
+		return
+	}
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	//row := m.DB.QueryRow("SELECT id, username, email, password FROM users WHERE username = $1", username)
+	ok, err := app.Models.User.CheckAuth(username, password)
+	if !ok && err == nil {
+		fmt.Println("Invalid username or password")
+		http.Error(w, "Invalid username or password", http.StatusBadRequest)
+		return
+	}
+	if !ok && err != nil {
+		fmt.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	app.currentUser.username = username
+	app.currentUser.IsLogin = true
+	app.currentUser.email = app.Models.User.GetEmail(username)
+	if app.currentUser.email == "" {
+		fmt.Println("Cannot get email")
+		http.Error(w, "Cannot get email", http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+}
+
+func (app *App)LoginGoogle(w http.ResponseWriter, r *http.Request) {
 	//Redirect to google specific url
 	// url := app.googleOauthConfig.AuthCodeURL(app.randomState)
 	//prompt=login=>forces Google to display the login screen, even if the user is already logged in with their Google account
@@ -87,6 +128,16 @@ func (app *App)Callback(w http.ResponseWriter, r *http.Request) {
 	if contentString != "" {
 		app.currentUser.IsLogin = true
 	}
+	user, err := app.Models.User.GetByEmail(app.currentUser.email)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if user == nil {
+		fmt.Println("User not found")
+		return
+	}
+	app.currentUser.username = user.Username.String
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 

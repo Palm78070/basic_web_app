@@ -22,6 +22,7 @@ type Login struct {
 	IsLogin bool
 	content map[string]interface{}
 	email string
+	username string
 }
 type App struct {
 	Settings *settings.Settings
@@ -57,7 +58,9 @@ func NewApp(config *settings.Settings, db *sql.DB, url map[string]string) *App {
 				},
 			},
 			clients: make(map[*websocket.Conn]bool),
+			dummy: make(map[string]*websocket.Conn),
 			broadcast: make(chan Message),
+			rooms: make(map[string][]string),
 		},
 	}
 }
