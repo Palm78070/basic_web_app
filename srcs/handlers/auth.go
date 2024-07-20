@@ -12,6 +12,8 @@ import (
 )
 
 func (app *App)Login(w http.ResponseWriter, r *http.Request) {
+	//session-name to retrieve session if exist or create a new one
+	// session, _ := app.SessionStore.Get(r, "session-name")
 	if r.Method == http.MethodGet {
 		app.renderTemplate(w, "login.html", map[string]any{
 		})
@@ -33,7 +35,11 @@ func (app *App)Login(w http.ResponseWriter, r *http.Request) {
 	ok, err := app.Models.User.CheckAuth(username, password)
 	if !ok && err == nil {
 		fmt.Println("Invalid username or password")
-		http.Error(w, "Invalid username or password", http.StatusBadRequest)
+		// http.Error(w, "Invalid username or password", http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]any{
+			"success": false,
+			"message": "Invalid username or password",
+		})
 		return
 	}
 	if !ok && err != nil {
@@ -41,14 +47,24 @@ func (app *App)Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	app.currentUser.username = username
-	app.currentUser.IsLogin = true
-	app.currentUser.email = app.Models.User.GetEmail(username)
-	if app.currentUser.email == "" {
-		fmt.Println("Cannot get email")
-		http.Error(w, "Cannot get email", http.StatusInternalServerError)
-		return
-	}
+	// app.currentUser.username = username
+	// app.currentUser.IsLogin = true
+	// app.currentUser.email = app.Models.User.GetEmail(username)
+	// if app.currentUser.email == "" {
+	// 	fmt.Println("Cannot get email")
+	// 	http.Error(w, "Cannot get email", http.StatusInternalServerError)
+	// 	return
+	// }
+
+	// session.Values["username"] = username
+	// session.Values["IsLogin"] = true
+	// session.Values["email"] = app.Models.User.GetEmail(username)
+	// if session.Values["email"] == "" {
+	// 	fmt.Println("Cannot get email")
+	// 	http.Error(w, "Cannot get email", http.StatusInternalServerError)
+	// 	return
+	// }
+	fmt.Println("User", username, "logged in successfully")
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 
@@ -56,6 +72,7 @@ func (app *App)LoginGoogle(w http.ResponseWriter, r *http.Request) {
 	//Redirect to google specific url
 	// url := app.googleOauthConfig.AuthCodeURL(app.randomState)
 	//prompt=login=>forces Google to display the login screen, even if the user is already logged in with their Google account
+
 	url := app.currentUser.googleOauthConfig.AuthCodeURL(app.currentUser.randomState, oauth2.AccessTypeOffline, oauth2.SetAuthURLParam("prompt", "login"))
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }

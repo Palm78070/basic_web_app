@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -30,15 +31,19 @@ type App struct {
 	Url string
 	currentUser *Login
 	chat *Chat
+	// SessionStore *sessions.CookieStore
 }
 
 func NewApp(config *settings.Settings, db *sql.DB, url map[string]string) *App {
+	fmt.Println("In NewApp")
+	// store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 	return &App{
 		Settings: config,
 		Models: &Models{
 			User: &models.UserModel{DB: db},
 		},
 		Url: url["scheme"] + url["host"] + url["port"],
+		// SessionStore: store,
 		currentUser: &Login{
 			googleOauthConfig: &oauth2.Config{
 				RedirectURL: url["scheme"] + url["host"] + url["port"] + "/callback",

@@ -55,7 +55,7 @@ func main() {
 	router.HandleFunc("/users/{username}", app.UserPage)
 	router.HandleFunc("/userList", app.UserList)
 	router.HandleFunc("/ws/{room_type}/{room_name}", app.HandleConnections)
-	go app.HandleMessages()
+	// go app.HandleMessages()
 	http.ListenAndServe(url["port"], router)
 	// http.ListenAndServe(":8080", router)
 }
