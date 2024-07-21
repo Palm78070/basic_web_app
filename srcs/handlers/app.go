@@ -8,6 +8,7 @@ import (
 
 	"github.com/Palm78070/basic_web_app/models"
 	"github.com/Palm78070/basic_web_app/settings"
+	"github.com/gorilla/sessions"
 	"github.com/gorilla/websocket"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -31,19 +32,19 @@ type App struct {
 	Url string
 	currentUser *Login
 	chat *Chat
-	// SessionStore *sessions.CookieStore
+	SessionStore *sessions.CookieStore
 }
 
 func NewApp(config *settings.Settings, db *sql.DB, url map[string]string) *App {
 	fmt.Println("In NewApp")
-	// store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
+	store := sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))
 	return &App{
 		Settings: config,
 		Models: &Models{
 			User: &models.UserModel{DB: db},
 		},
 		Url: url["scheme"] + url["host"] + url["port"],
-		// SessionStore: store,
+		SessionStore: store,
 		currentUser: &Login{
 			googleOauthConfig: &oauth2.Config{
 				RedirectURL: url["scheme"] + url["host"] + url["port"] + "/callback",

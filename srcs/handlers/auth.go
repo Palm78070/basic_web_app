@@ -13,7 +13,7 @@ import (
 
 func (app *App)Login(w http.ResponseWriter, r *http.Request) {
 	//session-name to retrieve session if exist or create a new one
-	// session, _ := app.SessionStore.Get(r, "session-name")
+	session, _ := app.SessionStore.Get(r, "session-name")
 	if r.Method == http.MethodGet {
 		app.renderTemplate(w, "login.html", map[string]any{
 		})
@@ -56,16 +56,25 @@ func (app *App)Login(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	// session.Values["username"] = username
-	// session.Values["IsLogin"] = true
-	// session.Values["email"] = app.Models.User.GetEmail(username)
-	// if session.Values["email"] == "" {
-	// 	fmt.Println("Cannot get email")
-	// 	http.Error(w, "Cannot get email", http.StatusInternalServerError)
-	// 	return
-	// }
+	session.Values["username"] = username
+	session.Values["IsLogin"] = true
+	session.Values["email"] = app.Models.User.GetEmail(username)
+	if session.Values["email"] == "" {
+		fmt.Println("Cannot get email")
+		http.Error(w, "Cannot get email", http.StatusInternalServerError)
+		return
+	}
+	err = session.Save(r, w)
+	if err != nil {
+		fmt.Println("Cannot save session when login: ", err)
+		http.Error(w, "Cannot save session when logging in", http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("IsLogin value in session: ", session.Values["IsLogin"])
+	app.session_map_user(session)
 	fmt.Println("User", username, "logged in successfully")
 	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+	// http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *App)LoginGoogle(w http.ResponseWriter, r *http.Request) {
@@ -83,8 +92,14 @@ func (app *App)Logout(w http.ResponseWriter, r *http.Request) {
 	}
 	app.currentUser.IsLogin = false
 
+	//Clear session data on server side
+	session, _ := app.SessionStore.Get(r, "session-name")
+	for k := range session.Values {
+		delete(session.Values, k)
+	}
+
 	http.SetCookie(w, &http.Cookie{
-		Name:   "session_token",
+		Name:   "session-name",
 		Value:  "",
 		Path:   "/",
 		MaxAge: -1,

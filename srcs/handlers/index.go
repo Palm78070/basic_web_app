@@ -6,6 +6,13 @@ import (
 )
 
 func (app *App) IndexPage(w http.ResponseWriter, r *http.Request) {
+	// fmt.Println("In IndexPage")
+	session, _ := app.SessionStore.Get(r, "session-name")
+	if !app.session_exist(session) {
+		// http.Redirect(w, r, "/login", http.StatusForbidden)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 	username := ""
 	if app.currentUser.IsLogin {
 		email := app.currentUser.email
