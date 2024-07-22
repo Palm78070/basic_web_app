@@ -13,6 +13,7 @@ func (app *App) IndexPage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
+	app.session_map_user(session)
 	username := ""
 	if app.currentUser.IsLogin {
 		email := app.currentUser.email

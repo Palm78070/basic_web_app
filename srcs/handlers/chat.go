@@ -64,12 +64,14 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 	if _, ok := app.chat.dummy[app.currentUser.username]; !ok {
 		app.chat.dummy[app.currentUser.username] = conn
 	}
-
+	fmt.Println("before in for loop")
 	for {
+		fmt.Println("in for loop")
 		var msg Message
 		err := conn.ReadJSON(&msg)
+		fmt.Println("msg is ", msg)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error reading msg: ", err)
 			delete(app.chat.clients, conn)
 			return
 		}

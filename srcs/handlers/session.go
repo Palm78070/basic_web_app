@@ -1,13 +1,11 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/gorilla/sessions"
 )
 
 func (app *App)session_map_user(session *sessions.Session){
-	fmt.Println("In session_map_user")
+	// fmt.Println("In session_map_user")
 	if session.Values["IsLogin"] != nil {
 		app.currentUser.IsLogin = session.Values["IsLogin"].(bool)
 	}
