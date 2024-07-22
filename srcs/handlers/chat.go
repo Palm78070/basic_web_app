@@ -25,6 +25,17 @@ type Message struct {
 }
 
 func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
+	session, err := app.SessionStore.Get(r, "session-name")
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	if !app.session_exist(session) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	}
+	app.session_map_user(session)
+
 	path_var := mux.Vars(r)
 	room_type := path_var["room_type"]
 
