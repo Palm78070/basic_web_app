@@ -25,6 +25,7 @@ type Message struct {
 }
 
 func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("In HandleConnections")
 	session, err := app.SessionStore.Get(r, "session-name")
 	if err != nil {
 		fmt.Println(err)
@@ -32,9 +33,14 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !app.session_exist(session) {
+		fmt.Println("User is not logged in")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
 	}
 	app.session_map_user(session)
+	fmt.Printf("Session values: %v\n", session.Values["IsLogin"])
+	fmt.Printf("Current user state: %+v\n", app.currentUser)
+
 
 	path_var := mux.Vars(r)
 	room_type := path_var["room_type"]
@@ -50,7 +56,12 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	defer conn.Close() //Close connection when it's not needed anymore
+	// defer conn.Close() //Close connection when it's not needed anymore
+
+	defer func() {
+		fmt.Println("Closing connection")
+		conn.Close()
+	}()
 
 	app.chat.clients[conn] = true //assign value of *Conn to true to indicate that connection is open
 
@@ -60,16 +71,22 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Connect to websocket: ", app.currentUser.username)
+	// var msg_dummy Message
+	// conn.ReadJSON(&msg_dummy)
+	// fmt.Println("Connect to websocket: ", msg_dummy)
 
 	if _, ok := app.chat.dummy[app.currentUser.username]; !ok {
 		app.chat.dummy[app.currentUser.username] = conn
 	}
-	fmt.Println("before in for loop")
 	for {
-		fmt.Println("in for loop")
+		fmt.Println("In HandleConnections for loop")
 		var msg Message
 		err := conn.ReadJSON(&msg)
 		fmt.Println("msg is ", msg)
+		if msg == (Message{}) {
+			fmt.Println("Empty message")
+			return
+		}
 		if err != nil {
 			fmt.Println("Error reading msg: ", err)
 			delete(app.chat.clients, conn)
@@ -80,8 +97,9 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) HandleMessages() {
-
+	fmt.Println("In HandleMessages")
 	for {
+		fmt.Println("In HandleMessages for loop")
 		msg := <-app.chat.broadcast
 		fmt.Printf("Sender: %v\n", msg.Sender)
 		fmt.Printf("Recipient: %v\n", msg.Recipient)
