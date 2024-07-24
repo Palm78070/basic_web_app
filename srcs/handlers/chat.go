@@ -11,8 +11,7 @@ import (
 
 type Chat struct {
 	upgrader *websocket.Upgrader
-	clients map[*websocket.Conn]bool
-	dummy map[string]*websocket.Conn
+	clients map[string]*websocket.Conn
 	broadcast chan Message
 	rooms map[string][]string
 }
@@ -25,7 +24,6 @@ type Message struct {
 }
 
 func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("In HandleConnections")
 	session, err := app.SessionStore.Get(r, "session-name")
 	if err != nil {
 		fmt.Println(err)
@@ -38,8 +36,6 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	app.session_map_user(session)
-	fmt.Printf("Session values: %v\n", session.Values["IsLogin"])
-	fmt.Printf("Current user state: %+v\n", app.currentUser)
 
 
 	path_var := mux.Vars(r)
@@ -56,14 +52,11 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	// defer conn.Close() //Close connection when it's not needed anymore
 
 	defer func() {
 		fmt.Println("Closing connection")
 		conn.Close()
 	}()
-
-	app.chat.clients[conn] = true //assign value of *Conn to true to indicate that connection is open
 
 	if app.currentUser.username == "" {
 		fmt.Println("User is not logged in")
@@ -71,25 +64,18 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Connect to websocket: ", app.currentUser.username)
-	// var msg_dummy Message
-	// conn.ReadJSON(&msg_dummy)
-	// fmt.Println("Connect to websocket: ", msg_dummy)
 
-	if _, ok := app.chat.dummy[app.currentUser.username]; !ok {
-		app.chat.dummy[app.currentUser.username] = conn
+	app.mutex.Lock()
+	if _, ok := app.chat.clients[app.currentUser.username]; !ok {
+		app.chat.clients[app.currentUser.username] = conn
 	}
+	app.mutex.Unlock()
+
 	for {
-		fmt.Println("In HandleConnections for loop")
 		var msg Message
 		err := conn.ReadJSON(&msg)
-		fmt.Println("msg is ", msg)
-		if msg == (Message{}) {
-			fmt.Println("Empty message")
-			return
-		}
 		if err != nil {
 			fmt.Println("Error reading msg: ", err)
-			delete(app.chat.clients, conn)
 			return
 		}
 		app.chat.broadcast <- msg
@@ -97,45 +83,45 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) HandleMessages() {
-	fmt.Println("In HandleMessages")
+	app.wg.Add(1)
+	defer app.wg.Done()
 	for {
-		fmt.Println("In HandleMessages for loop")
-		msg := <-app.chat.broadcast
-		fmt.Printf("Sender: %v\n", msg.Sender)
-		fmt.Printf("Recipient: %v\n", msg.Recipient)
-		fmt.Printf("Message: %v\n", msg.Message)
-		users := []string{msg.Sender, msg.Recipient}
-		sort.Strings(users)
-		fmt.Println("sort users is ", users)
-		room_name := users[0] + "_" + users[1]
-		fmt.Println("room_name is ", room_name)
-
-		if _, ok := app.chat.rooms[room_name]; !ok {
-			app.chat.rooms[room_name] = users
+		fmt.Println("HandleMessages")
+		msg, ok := <-app.chat.broadcast
+		if !ok {
+			fmt.Println("Broadcast channel is closed")
+			return
 		}
 
+		users := []string{msg.Sender, msg.Recipient}
+		sort.Strings(users)
+		room_name := users[0] + "_" + users[1]
+
+		app.mutex.Lock()
+		if app.chat.rooms != nil {
+			if _, ok := app.chat.rooms[room_name]; !ok {
+				app.chat.rooms[room_name] = users
+			}
+		}
+		app.mutex.Unlock()
+
 		for _, user := range app.chat.rooms[room_name] {
-			fmt.Println("User is ", user)
-			if _, ok := app.chat.dummy[user]; !ok {
+			if app.chat.rooms == nil {
+				fmt.Println("room map is nil")
+				break
+			}
+			app.mutex.Lock()
+			client, ok := app.chat.clients[user]
+			app.mutex.Unlock()
+			if !ok {
 				fmt.Println("User is not connected to websocket")
 				continue
 			}
-			client := app.chat.dummy[user]
 			err := client.WriteJSON(msg)
 			if err != nil {
 				fmt.Println(err)
 				client.Close()
-				delete(app.chat.dummy, user)
 			}
 		}
-
-		// for client := range app.chat.clients {
-		// 	err := client.WriteJSON(msg) //send a JSON-encoded message over a WebSocket
-		// 	if err != nil {
-		// 		fmt.Println(err)
-		// 		client.Close()
-		// 		delete(app.chat.clients, client)
-		// 	}
-		// }
 	}
 }

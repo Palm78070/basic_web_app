@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/Palm78070/basic_web_app/db"
 	"github.com/Palm78070/basic_web_app/handlers"
@@ -14,6 +16,11 @@ import (
 )
 
 func main() {
+	sig_ch := make(chan os.Signal, 1)
+	// signal.Notify(sig_ch, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sig_ch, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
+	done := make(chan struct{})
+
 	config, err := settings.LoadSettings()
 	if err != nil {
 		log.Fatalf("Error loading settings: %v", err)
@@ -56,6 +63,11 @@ func main() {
 	router.HandleFunc("/userList", app.UserList)
 	router.HandleFunc("/ws/{room_type}/{room_name}", app.HandleConnections)
 	go app.HandleMessages()
-	http.ListenAndServe(url["port"], router)
-	// http.ListenAndServe(":8080", router)
+	go app.Cleanup(sig_ch, done)
+	log.Fatal(http.ListenAndServe(url["port"], router))
+
+	<-done
+	log.Println("Server stopped")
+	close(sig_ch)
+	os.Exit(0)
 }

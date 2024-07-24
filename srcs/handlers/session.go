@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/gorilla/sessions"
 )
 
@@ -20,8 +18,6 @@ func (app *App)session_map_user(session *sessions.Session){
 }
 
 func (app *App)session_exist(session *sessions.Session) (bool){
-	fmt.Println("In session_exist")
 	_, ok := session.Values["IsLogin"]
-	fmt.Println("session_exist: ", ok)
 	return ok
 }

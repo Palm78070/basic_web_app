@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/Palm78070/basic_web_app/models"
 	"github.com/Palm78070/basic_web_app/settings"
@@ -33,6 +34,8 @@ type App struct {
 	currentUser *Login
 	chat *Chat
 	SessionStore *sessions.CookieStore
+	wg sync.WaitGroup
+	mutex sync.Mutex
 }
 
 func NewApp(config *settings.Settings, db *sql.DB, url map[string]string) *App {
@@ -63,8 +66,7 @@ func NewApp(config *settings.Settings, db *sql.DB, url map[string]string) *App {
 					return true
 				},
 			},
-			clients: make(map[*websocket.Conn]bool),
-			dummy: make(map[string]*websocket.Conn),
+			clients: make(map[string]*websocket.Conn),
 			broadcast: make(chan Message),
 			rooms: make(map[string][]string),
 		},
