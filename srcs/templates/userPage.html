@@ -7,7 +7,10 @@
 	<link rel="stylesheet" href="/static/css/chat.css">
 </head>
 <body>
-	<h1>{{.User.Username.String}}</h1>
+	<div class="login-user-container">
+		<h2 id="login-username">Login user: {{.LoginUser}}</h2>
+	</div>
+	<h2 id="username">{{.User.Username.String}}</h2>
 	<p>{{.User.Email}}</p>
 	<!-- chat box -->
 	<div id="chat-room" class="chat-frame"></div>

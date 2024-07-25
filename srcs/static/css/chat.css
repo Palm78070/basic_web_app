@@ -21,6 +21,11 @@
 	/* Parts that are inside the region are shown, while those outside are hidden. */
 }
 
+.login-user-container {
+	display: flex;
+	justify-content: center;
+}
+
 #chat-room {
 	height: 40vh;
 }
