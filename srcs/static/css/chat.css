@@ -26,6 +26,12 @@
 	justify-content: center;
 }
 
+.recipient-bubble-container {
+	display: flex;
+	height: 2vh;
+	margin-left: 1vw;
+}
+
 #chat-room {
 	height: 40vh;
 }

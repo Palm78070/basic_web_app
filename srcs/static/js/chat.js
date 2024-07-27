@@ -14,15 +14,37 @@ chat_socket = new WebSocket(
 	login_username
 );
 
-chat_socket.addEventListener('open', function(e){
+chat_socket.onopen = function(e) {
 	console.log("Websocket is now open")
-})
+}
 
-document.getElementById("submit").addEventListener("click", function() {
-	const message = document.getElementById("chat-input").value;
-	if (message === "") {
-		return;
+chat_socket.onmessage = function(e) {
+	console.log("Message received: ", e.data);
+	const data = JSON.parse(e.data);
+	console.log(data);
+	const message = data.message;
+	const sender = data.sender;
+	// const recipient = data.recipient;
+
+	document.getElementById("chat-room").innerHTML += `<div class="recipient-bubble-container">` + sender + `: ` + message + `</div>`;
+}
+
+function handleSendMessage(e) {
+	if (e.type === "click" || (e.type === "keypress" && e.key === "Enter")) {
+		const message = document.getElementById("chat-input").value;
+		if (message === "") {
+			return;
+		}
+		// console.log(message);
+		document.getElementById("chat-input").value = "";
+		chat_socket.send(JSON.stringify({
+			"message": message,
+			"sender": login_username,
+			"recipient": recipient
+		}))
 	}
-	console.log(message);
-	document.getElementById("chat-input").value = "";
-})
+}
+
+document.getElementById("submit").addEventListener("click", handleSendMessage);
+
+document.getElementById("chat-input").addEventListener("keypress", handleSendMessage);

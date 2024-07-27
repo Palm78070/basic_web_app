@@ -30,6 +30,8 @@ func (app *App)Login(w http.ResponseWriter, r *http.Request) {
 	}
 	username := r.FormValue("username")
 	password := r.FormValue("password")
+	fmt.Println("Username: ", username)
+	fmt.Println("Password: ", password)
 
 	//row := m.DB.QueryRow("SELECT id, username, email, password FROM users WHERE username = $1", username)
 	ok, err := app.Models.User.CheckAuth(username, password)
