@@ -4,7 +4,7 @@
 
 .chat-frame {
 	width: 50vw;
-	display: flex;
+	overflow-y: auto;
 	border: 1px solid black;
 	border-radius: 10px;
 }
@@ -28,11 +28,27 @@
 
 .recipient-bubble-container {
 	display: flex;
-	height: 2vh;
+	/* height: 2vh; */
+	height: auto;
 	margin-left: 1vw;
+	margin-bottom: 2vh;
+}
+
+.sender-bubble-container {
+	display: flex;
+	justify-content: flex-end;
+	/* height: 2vh; */
+	height: auto;
+	margin-right: 1vw;
+	margin-bottom: 2vh;
 }
 
 #chat-room {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	overflow-y: auto;
+	scroll-behavior: auto;
 	height: 40vh;
 }
 

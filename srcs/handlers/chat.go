@@ -56,6 +56,7 @@ func (app *App) HandleConnections(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		fmt.Println("Closing connection")
 		conn.Close()
+		delete(app.chat.clients, app.currentUser.username)
 	}()
 
 	if app.currentUser.username == "" {
@@ -112,6 +113,7 @@ func (app *App) HandleMessages() {
 			}
 			app.mutex.Lock()
 			client, ok := app.chat.clients[user]
+			fmt.Println("User: ", user)
 			app.mutex.Unlock()
 			if !ok {
 				fmt.Println("User is not connected to websocket")
@@ -119,6 +121,7 @@ func (app *App) HandleMessages() {
 			}
 			err := client.WriteJSON(msg)
 			if err != nil {
+				fmt.Println("xxx")
 				fmt.Println(err)
 				client.Close()
 			}

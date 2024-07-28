@@ -26,7 +26,30 @@ chat_socket.onmessage = function(e) {
 	const sender = data.sender;
 	// const recipient = data.recipient;
 
-	document.getElementById("chat-room").innerHTML += `<div class="recipient-bubble-container">` + sender + `: ` + message + `</div>`;
+	const bubble_type = sender === login_username ? "sender-bubble-container": "recipient-bubble-container";
+
+	const msg_div = document.createElement("div");
+	msg_div.className = bubble_type;
+	msg_div.textContent = sender + ": " + message;
+
+	document.getElementById("chat-room").appendChild(msg_div);
+
+	// document.getElementById("chat-room").innerHTML += `<div class=${bubble_type}>` + sender + `: ` + message + `</div>`;
+	scrollToBottom();
+
+	// Force reflow
+	// chat_room.offsetHeight;
+	// document.getElementById("chat-room").offsetHeight;
+
+	// Use a timeout to ensure the DOM updates before scrolling
+	// setTimeout(scrollToBottom, 0);
+}
+
+function scrollToBottom() {
+	const chat_room = document.getElementById("chat-room");
+	console.log("Scrolling to bottom, chat_room.scrollHeight: ", chat_room.scrollHeight);
+	chat_room.scrollTop = chat_room.scrollHeight;
+	console.log("chat_room.scrollTop after scroll: ", chat_room.scrollTop);
 }
 
 function handleSendMessage(e) {
