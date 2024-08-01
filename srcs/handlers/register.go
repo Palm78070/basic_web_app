@@ -21,9 +21,9 @@ func (app *App) is_register_user(username string, email string) bool {
 	return result
 }
 
-func (app *App) registerUser(username string, email string) {
-	sqlStatement := "INSERT INTO users (username, email) VALUES ($1, $2)"
-	_, err := app.Models.User.DB.Exec(sqlStatement, username, email)
+func (app *App) registerUser(username string, email string, password string) {
+	sqlStatement := "INSERT INTO users (username, email, password) VALUES ($1, $2, $3)"
+	_, err := app.Models.User.DB.Exec(sqlStatement, username, email, password)
 	if err != nil {
 		fmt.Printf("Error inserting user into database: %v\n", err)
 		return
@@ -55,8 +55,9 @@ func (app *App) RegisterPage(w http.ResponseWriter, r* http.Request) {
 		}
 
 		user.Email = r.FormValue("email")
+		user.Password = r.FormValue("password")
 
-		if !user.Username.Valid || user.Email == "" {
+		if !user.Username.Valid || user.Email == "" || user.Password == "" {
 			log.Printf("Invalid form submission\n")
 			json.NewEncoder(w).Encode(map[string]any{
 				"success": false,
@@ -75,9 +76,10 @@ func (app *App) RegisterPage(w http.ResponseWriter, r* http.Request) {
 		}
 
 		fmt.Println("username: ", user.Username)
+		fmt.Println("password: ", user.Password)
 		fmt.Println("email: ", user.Email)
 
-		app.registerUser(user.Username.String, user.Email)
+		app.registerUser(user.Username.String, user.Email, user.Password)
 		// http.Redirect(w, r, "/register", http.StatusSeeOther)
 		json.NewEncoder(w).Encode(map[string]any{
 			"success": true,

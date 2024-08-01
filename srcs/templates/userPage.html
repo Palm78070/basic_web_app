@@ -4,11 +4,23 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>{{.User.Username.String}}</title>
+	<link rel="stylesheet" href="/static/css/chat.css">
 </head>
 <body>
-	<h1>{{.User.Username.String}}</h1>
+	<div class="login-user-container">
+		<h2 id="login-username">Login user: {{.LoginUser}}</h2>
+	</div>
+	<h2 id="username">{{.User.Username.String}}</h2>
 	<p>{{.User.Email}}</p>
+	<!-- chat box -->
+	<div id="chat-room" class="chat-frame"></div>
+	<!-- <form id="chat-form"> -->
+	<label for="chat-input" class="visually-hidden">Chat Input</label>
+	<input id="chat-input" type="text" size="100">
+	<input id="submit" type="button" value="Send">
+	<!-- </form> -->
 	<p>Back to <a href="{{.URL}}/userList">user page</a></p>
 	<p>Back to <a href="{{.URL}}/">Home page</a></p>
+	<script src="/static/js/chat.js"></script>
 </body>
 </html>

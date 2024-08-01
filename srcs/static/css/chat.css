@@ -1,0 +1,64 @@
+:root {
+	--chat-input-height: 4vh;
+}
+
+.chat-frame {
+	width: 50vw;
+	overflow-y: auto;
+	border: 1px solid black;
+	border-radius: 10px;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	overflow: hidden; /*This hides any content that might overflow beyond the element’s small dimensions.*/
+	clip-path: rect(0 0 0 0); /*creates a clipping region that sets what part of an element should be shown*/
+	/* Parts that are inside the region are shown, while those outside are hidden. */
+}
+
+.login-user-container {
+	display: flex;
+	justify-content: center;
+}
+
+.recipient-bubble-container {
+	display: flex;
+	/* height: 2vh; */
+	height: auto;
+	margin-left: 1vw;
+	margin-bottom: 2vh;
+}
+
+.sender-bubble-container {
+	display: flex;
+	justify-content: flex-end;
+	/* height: 2vh; */
+	height: auto;
+	margin-right: 1vw;
+	margin-bottom: 2vh;
+}
+
+#chat-room {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	overflow-y: auto;
+	scroll-behavior: auto;
+	height: 40vh;
+}
+
+#chat-input {
+	width: 45vw;
+	height: var(--chat-input-height);
+	margin-top: 1vh;
+}
+
+#submit {
+	height: var(--chat-input-height);
+	width: 4vw;
+}

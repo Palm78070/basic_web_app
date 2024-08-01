@@ -8,6 +8,13 @@ import (
 )
 
 func (app *App) UserPage(w http.ResponseWriter, r *http.Request) {
+	session, _ := app.SessionStore.Get(r, "session-name")
+	if !app.session_exist(session) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	app.session_map_user(session)
+
 	vars := mux.Vars(r)
 
 	user, err := app.Models.User.GetByUsername(vars["username"])
@@ -22,6 +29,7 @@ func (app *App) UserPage(w http.ResponseWriter, r *http.Request) {
 
 	app.renderTemplate(w, "userPage.html", map[string]any{
 		"User": user,
+		"LoginUser": app.currentUser.username,
 	})
 }
 

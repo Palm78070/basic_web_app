@@ -18,7 +18,7 @@ document.getElementById("registerForm").addEventListener("submit", function(even
 			'Accept': 'application/json',
 		}
 	}).then(response => {
-		return response.json();
+		return response.json(); //ensures that the next .then block only runs after the JSON has been successfully parsed
 	}).then(data => {
 		if (data.success) {
 			//changes the CSS display property of the HTML element with the id successMessage to block
