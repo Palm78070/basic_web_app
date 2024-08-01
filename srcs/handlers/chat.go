@@ -87,7 +87,7 @@ func (app *App) HandleMessages() {
 	app.wg.Add(1)
 	defer app.wg.Done()
 	for {
-		fmt.Println("HandleMessages")
+		// fmt.Println("HandleMessages")
 		msg, ok := <-app.chat.broadcast
 		if !ok {
 			fmt.Println("Broadcast channel is closed")
@@ -113,7 +113,6 @@ func (app *App) HandleMessages() {
 			}
 			app.mutex.Lock()
 			client, ok := app.chat.clients[user]
-			fmt.Println("User: ", user)
 			app.mutex.Unlock()
 			if !ok {
 				fmt.Println("User is not connected to websocket")
