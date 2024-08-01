@@ -87,7 +87,7 @@ func (app *App) HandleMessages() {
 	app.wg.Add(1)
 	defer app.wg.Done()
 	for {
-		fmt.Println("HandleMessages")
+		// fmt.Println("HandleMessages")
 		msg, ok := <-app.chat.broadcast
 		if !ok {
 			fmt.Println("Broadcast channel is closed")
