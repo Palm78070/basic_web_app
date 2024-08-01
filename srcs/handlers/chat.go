@@ -113,7 +113,6 @@ func (app *App) HandleMessages() {
 			}
 			app.mutex.Lock()
 			client, ok := app.chat.clients[user]
-			fmt.Println("User: ", user)
 			app.mutex.Unlock()
 			if !ok {
 				fmt.Println("User is not connected to websocket")
